@@ -1,0 +1,22 @@
+1.create the wcinput.txt file in local os
+    cat>avgsalinput.txt
+        1001,rama,male,20000,hyd
+        1002,sita,female,10000,hyd
+        1003,lokesh,male,30000,vij
+        1004,anu,female,20000,vij
+        1005,balu,male,20000,bang
+        1006,venkat,male,20000,bang
+        ctrl+d
+2.load the avgsalinput.txt file from local os to hdfs 
+  hadoop fs -rmr lokesh
+  hadoop fs -mkdir lokesh
+  hadoop fs -put avgsalinput.txt lokesh/
+3.execute the jar file
+  hadoop fs -rmr sathya
+  hadoop jar Desktop/avgsal.jar com.sathya.AvgSalDriver   lokesh/avgsalinput.txt sathya
+4.see the results
+   hadoop fs -cat sathya/part-r-00000
+   bang    20000
+   hyd     15000
+   vij     25000
+

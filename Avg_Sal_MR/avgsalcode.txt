@@ -1,0 +1,62 @@
+package com.sathya;
+import java.io.IOException;
+import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.LongWritable;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapreduce.Mapper;
+public class AvgSalMapper extends Mapper<LongWritable,Text,Text,IntWritable>
+{
+	public void map(LongWritable k, Text v, Context con)throws IOException, InterruptedException 
+	{
+		String line = v.toString();
+		String[] words = line.split(",");
+		String city = words[4];
+		int sal = Integer.parseInt(words[3]);			con.write(new Text(city), new IntWritable(sal));
+	}
+}
+
+package com.sathya;
+import java.io.IOException;
+import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapreduce.Reducer;
+public class AvgSalReducer extends Reducer<Text,IntWritable,Text,IntWritable>
+{
+public void reduce(Text city, Iterable<IntWritable> salaries, Context con)throws IOException, InterruptedException 
+{
+int tot = 0;
+int count=0;
+for (IntWritable sal : salaries) {
+	tot=tot+sal.get();
+	count++;
+}
+int avg=tot/count;
+
+con.write(city, new IntWritable(avg));
+}
+}
+
+package com.sathya;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+public class AvgSalDriver 
+{
+	public static void main(String args[])throws Exception
+	{
+	Configuration c=new Configuration();
+	Job j= new Job(c,"AvgSalJob");
+	j.setJarByClass(AvgSalDriver.class);
+	j.setMapperClass(AvgSalMapper.class);
+	j.setReducerClass(AvgSalReducer.class);
+	j.setOutputKeyClass(Text.class);
+	j.setOutputValueClass(IntWritable.class);
+	FileInputFormat.addInputPath(j,new Path(args[0]));
+    FileOutputFormat.setOutputPath(j,new Path(args[1]));
+	System.exit(j.waitForCompletion(true) ? 0 : 1);
+}
+}

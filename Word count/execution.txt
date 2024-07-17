@@ -1,0 +1,14 @@
+1.create the wcinput.txt file in local os
+    cat>wcinput.txt
+        Apple Orange Mango
+        Orange Grapes Plum
+        Apple Plum Mango
+        Apple Apple Plum
+        ctrl+d
+2.load the wcinput.txt file from local os to hdfs 
+  hadoop fs -mkdir lokesh
+  hadoop fs -put wcinput.txt lokesh/
+3.execute the jar file
+  hadoop jar Desktop/wordcount.jar com.sathya.WordCountDriver /lokesh/wcinput.txt /sathya
+4.see the results
+   hadoop fs -cat /sathya/part-r-00000
